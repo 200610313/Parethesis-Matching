@@ -1,129 +1,144 @@
 /*
 Angelu Ferdinand A. Garcia
-CC13-A | Mr. Jun Rangie Obispo
-12/9/18
+CC12-A | Mr. Jun Rangie Obispo
+1/11/19
 This program evaluates if parentheses are matched.
 */
 
 import java.util.Scanner;
 public class mParen
 {
-    public static void main(String args[])
-    {
+    public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
-        int numCases = input.nextInt();
+        int cases = input.nextInt();
 
-        String[] paren = new String[numCases];
-        myStack parenthesesStack = new myStack();
+        String[] paren = new String[cases];
+        myStacks stack = new myStacks(cases);
 
-        for(int i = 0; i < numCases; i++)
+        for (int i = 0; i < cases; i++)
         {
             paren[i] = input.next();
+
+            if (isMatched(paren[i], stack)==true)
+            {
+                paren[i]="properly matched";//reusing array of type string paren, previously used for storage of inputs, for storage of results.
+                stack.clear();
+            }
+            else {
+                paren[i]="not properly matched";
+                stack.clear();
+            }
         }
         System.out.println();
-
-        for(int j = 0; j < numCases; j++)
-        {
-            j++;
-            System.out.print("Case #" +j+ ": ");
-            j--;
-            isMatched(paren[j], parenthesesStack);
-
-            if(parenthesesStack.isEmpty()==false)
-            {
-                parenthesesStack.clear();
-            }
-        }
+        printResults(paren);
     }
 
-    public static void isMatched(String paren, myStack parenthesesStack)
+    public static boolean isMatched(String characters, myStacks stack)//receives the String of parentheses to be analyzed, and stack for push and pop
+                                                                        //returns true if stack is empty
+                                                                        //returns false if stack is not empty
     {
-        boolean isValid = true;
-        for(int k = 0; k<paren.length(); k++)
+        for (int i = 0; i<characters.length(); i++)
         {
-            if(paren.charAt(k)=='(')//add to stack if opening bracket,
-                                    //if closing bracket, pop.
-            {
-                parenthesesStack.push(k);
-            }
-            else if(paren.charAt(k)==')')
-            {
-                parenthesesStack.pop();
-            }
+            if (characters.charAt(i)=='(')
+                stack.push(1);
             else
-            {
-                isValid = false;
-                break;
-            }
+                stack.pop();
         }
-        //Only if stack if empty, the parentheses are matched.
-        if(isValid == true)
-        {
-            if(parenthesesStack.isEmpty())
-            {
-                System.out.println("properly matched");
-            }
-            else
-            {
-                System.out.println("not properly matched");
-            }
-        }
+
+        if (stack.isEmpty()==false || stack.isNegativeTop()==true)// if stack is not empty, and if pop operations done > the array size, unmatched.
+            return false;
         else
-        {
-            System.out.println("Error: invalid input");
-        }
+            return true;
+    }
+
+    public static void printResults(String[] paren)
+    {
+        for (int i = 0; i<paren.length; i++)
+            System.out.println("Case#"+(i+1)+": "+paren[i]);
+        return;
     }
 }
 
-public class stackNode
+public class myStacks
 {
-    public int info;
-    public stackNode next;
-    public stackNode(int i)
+    private int[] arrayStack;
+    private int size;
+    private int top=-1;
+
+    public myStacks(int x)//setter
     {
-        this(i,null);
+        size = x;
+        arrayStack = new int[size];
     }
-    public stackNode(int i, stackNode n)
+    public boolean isFull()
     {
-        info = i; next = n;
-    }
-}
-
-
-public class myStack
-{
-    protected stackNode top;
-
-    public myStack()
-    {
-        top = null;
+        if (top==size-1)
+            return true;
+        else
+            return false;
     }
     public boolean isEmpty()
     {
-        return top == null;
+        if (top==-1)
+            return true;
+        else
+            return false;
     }
-
-    public void push(int x)
+    /*public boolean isEmpty()//alternative operation of checking if stack is empty.
     {
-        top = new stackNode(x, top);
+        for (int i = 0; i<size; i++)
+        {
+            if (arrayStack[i]>0)
+                return false;
+        }
+        return true;
+    }*/
+    public void push(int el)
+    {
+        if (isFull()==true)
+        {
+            //System.out.println("Error: Stack is full.");
+            return;
+        }
+        else
+        {
+            top++;
+            arrayStack[top]=el;
+            return;
+        }
     }
-
-    public int pop()
+    public void pop()
     {
-        int x = top.info;
-        top = top.next;
-        return x;
+        /*if (isEmpty()==true) //THESE CAN'T BE USED GIVEN THE PROBLEM
+        {
+            //System.out.println("Error: Stack is empty.");
+            return;
+        }
+        else
+        {
+            top--;
+            return;
+        }*/
+        top--;
+        return;
+    }
+    public int peek()
+    {
+        return arrayStack[top];
     }
 
     public void clear()
     {
-        for(stackNode temp = top; temp != null; temp = temp.next)
-        {
-            pop();
-        }
+        top=-1;
+        return;
+    }
+    public boolean isNegativeTop()
+    {
+        if (top<-1)
+            return true;
+        else
+            return false;
     }
 
+
 }
-
-
-
